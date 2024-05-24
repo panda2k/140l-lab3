@@ -18,6 +18,7 @@ module traffic_light_controller1(
                 RGR, RYR, RZR, RHR, 	         // EL+WL
                 RRG, RRY, RRZ, RRH} tlc_states;  // NS
   tlc_states    present_state, next_state;
+
   int     ctr5, next_ctr5,       //  5 sec timeout when my traffic goes away
           ctr10, next_ctr10;     // 10 sec limit when other traffic presents
 
@@ -43,24 +44,108 @@ module traffic_light_controller1(
     next_ctr10 = 0;
     case(present_state)
 /* ************* Fill in the case statements ************** */
-	  GRR: begin 
+	  GRR: begin
+          // no traffic
+          // traffic on straight EW
+          // traffic on left EW
+          // traffic on straight NS 
+          // traffic on straight EW + left EW 
+          // traffic on straight EW + straight NS 
+          // traffic on left EW + straight NS 
+          // traffic on all lanes
+          if (!s_s || ctr5) begin
+            next_ctr5 = ctr5 + 1;
+        end
+        if (l_s || n_s || ctr10) begin
+            next_ctr10 = ctr10 + 1;
+        end 
+        if (next_ctr5 == 5 || next_ctr10 == 10) begin
+            next_state = YRR;
+          end
          // when is next_state GRR? YRR?
          // what does ctr5 do? ctr10?
-      end  
+      end 
+      YRR: begin 
+        next_state = ZRR;
+      end
+      ZRR: begin 
+        next_state = HRR;
+      end
+      HRR: begin 
+        if (l_s) begin
+            next_state = RGR;
+        end else if (n_s) begin 
+            next_state = RRG;
+        end else if (s_s) begin 
+            next_state = GRR;
+        end 
+      end
+      RGR: begin 
+          if (!l_s || ctr5) begin
+            next_ctr5 = ctr5 + 1;
+           end
+           if (s_s || n_s || ctr10) begin
+            next_ctr10 = ctr10 + 1;
+          end
+          if (next_ctr5 == 5 || next_ctr10 == 10) begin
+            next_state = RYR;
+          end
+      end
+      RYR: begin 
+        next_state = RZR;
+      end
+      RZR: begin 
+        next_state = RHR;
+      end
+      RHR: begin
+        if(n_s) begin
+            next_state = RRG;
+        end else if (s_s) begin 
+            next_state = GRR;
+        end else if (l_s) begin 
+            next_state = RGR;
+        end 
+      end
+      RRG: begin 
+          if (!n_s || ctr5) begin
+            next_ctr5 = ctr5 + 1;
+           end
+           if (l_s || s_s || ctr10) begin
+            next_ctr10 = ctr10 + 1;
+          end
+            if (next_ctr5 == 5 || next_ctr10 == 10) begin
+                next_state = RRY;
+          end
+      end
+      RRY: begin 
+        next_state = RRZ;
+      end
+      RRZ: begin 
+        next_state = RRH;
+      end
+      RRH: begin
+        if(s_s) begin
+            next_state = GRR;
+        end else if (l_s) begin 
+            next_state = RGR;
+        end else if (n_s) begin
+            next_state = RRG;
+        end 
+      end
      // etc. 
     endcase
   end
 
 // combination output driver  ("C2" block in the Harris & Harris Moore machine diagram)
   always_comb begin
-    str_light  = red;      // cover all red plus undefined cases
-	left_light = red;	   // default to red, then call out exceptions in case
+    ew_str_light  = red;      // cover all red plus undefined cases
+	ew_left_light = red;	   // default to red, then call out exceptions in case
 	ns_light   = red;
     case(present_state)    // Moore machine
-      GRR:     str_light  = green;
-	  YRR,ZRR: str_light  = yellow;  // my dual yellow states -- brute force way to make yellow last 2 cycles
-	  RGR:     left_light = green;
-	  RYR,RZR: left_light = yellow;
+      GRR:     ew_str_light  = green;
+	  YRR,ZRR: ew_str_light  = yellow;  // my dual yellow states -- brute force way to make yellow last 2 cycles
+	  RGR:     ew_left_light = green;
+	  RYR,RZR: ew_left_light = yellow;
 	  RRG:     ns_light   = green;
 	  RRY,RRZ: ns_light   = yellow;
     endcase

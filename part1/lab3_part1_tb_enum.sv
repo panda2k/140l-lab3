@@ -23,9 +23,9 @@ colors ew_left_light1,          // left arrow e-w turn onto n-s
 // your controller goes here
 // input ports = logics above
 // output ports = colors (each 2 bits wide)
-traffic_light_controller dut(.clk(clk),.reset(reset),
+traffic_light_controller1 dut(.clk(clk),.reset(reset),
   .s_s(ew_str_sensor), .l_s(ew_left_sensor), .n_s(ns_sensor),
-  .str_light(ew_str_light),.left_light(ew_left_light),.ns_light);
+  .ew_str_light(ew_str_light),.ew_left_light(ew_left_light),.ns_light(ns_light1));
 /*
 traffic_light_controller1 dut1(.clk(clk),.reset(reset),
   .s_s(ew_str_sensor), .l_s(ew_left_sensor), .n_s(ns_sensor),
