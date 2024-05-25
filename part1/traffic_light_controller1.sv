@@ -45,23 +45,16 @@ module traffic_light_controller1(
     case(present_state)
 /* ************* Fill in the case statements ************** */
 	  GRR: begin
-          // no traffic
-          // traffic on straight EW
-          // traffic on left EW
-          // traffic on straight NS 
-          // traffic on straight EW + left EW 
-          // traffic on straight EW + straight NS 
-          // traffic on left EW + straight NS 
-          // traffic on all lanes
-          if (!s_s || ctr5) begin
+        if (!s_s || ctr5) begin
             next_ctr5 = ctr5 + 1;
         end
         if (l_s || n_s || ctr10) begin
             next_ctr10 = ctr10 + 1;
         end 
+        next_state = GRR;
         if (next_ctr5 == 5 || next_ctr10 == 10) begin
             next_state = YRR;
-          end
+        end
          // when is next_state GRR? YRR?
          // what does ctr5 do? ctr10?
       end 
@@ -87,7 +80,8 @@ module traffic_light_controller1(
            if (s_s || n_s || ctr10) begin
             next_ctr10 = ctr10 + 1;
           end
-          if (next_ctr5 == 5 || next_ctr10 == 10) begin
+        next_state = RGR;
+        if (next_ctr5 == 5 || next_ctr10 == 10) begin
             next_state = RYR;
           end
       end
@@ -109,11 +103,12 @@ module traffic_light_controller1(
       RRG: begin 
           if (!n_s || ctr5) begin
             next_ctr5 = ctr5 + 1;
-           end
-           if (l_s || s_s || ctr10) begin
+          end
+          if (l_s || s_s || ctr10) begin
             next_ctr10 = ctr10 + 1;
           end
-            if (next_ctr5 == 5 || next_ctr10 == 10) begin
+          next_state = RRG;
+          if (next_ctr5 == 5 || next_ctr10 == 10) begin
                 next_state = RRY;
           end
       end
@@ -130,7 +125,7 @@ module traffic_light_controller1(
             next_state = RGR;
         end else if (n_s) begin
             next_state = RRG;
-        end 
+        end
       end
      // etc. 
     endcase

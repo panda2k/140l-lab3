@@ -3,7 +3,6 @@
 // expanded version -- try the simpler traffic_tb first if
 //  you do not pass this one
 // 
-import light_package ::*;
 module lab3_part2_tb;
 
 bit     clk           ;	                  
